@@ -1,9 +1,11 @@
 import os
 import shutil
 import subprocess
+import sys
 
 import requests
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def download_mlxai():
     if not os.path.exists("codepilot.exe"):

@@ -1,9 +1,15 @@
+import os
+
 import httpx
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+
+load_dotenv("../../.env")
 
 class Search:
-    def __init__(self, api_key: str, search_engine_id: str, **kwargs):
+    def __init__(self, api_key: str = os.getenv("SEARCH_TOKEN"),
+                 search_engine_id: str = os.getenv("SEARCH_ID"), **kwargs):
         self.api_key = api_key
         self.search_engine_id = search_engine_id
         self.endpoint = "https://www.googleapis.com/customsearch/v1"
@@ -59,7 +65,6 @@ class Search:
             from explore.src.main import request_mlxai
             print(f"Reviewing link {i + 1}...")
             print(request_mlxai("gpt-4o", text))
-
 
 """
 # Example usage
