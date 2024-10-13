@@ -8,7 +8,7 @@ import requests
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def download_mlxai():
-    if not os.path.exists("codepilot.exe"):
+    if not os.path.exists("explore.exe"):
         explore_url = "https://github.com/molexai/mlx/raw/main/explore.exe"
         local_path = os.path.abspath("explore.exe")
         response = requests.get(explore_url, stream=True)

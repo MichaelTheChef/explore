@@ -59,25 +59,12 @@ class Search:
 
     def review(self):
         to_review = Search.retrieve(self.search(self.query))
-        assert type(to_review) == list, "The output should be a list"
 
-        for i, text in enumerate(to_review):
-            from explore.src.main import request_mlxai
-            print(f"Reviewing link {i + 1}...")
-            print(request_mlxai("gpt-4o", text))
+        result = f"QUERY: {self.query}, TEXT_LIST: ["
+        for text in to_review:
+            result += f"'{text[:3000]}...', "
+        result += "]"
 
-"""
-# Example usage
-
-if __name__ == "__main__":
-
-    api_key = "YOUR_API_KEY"
-    search_engine_id = "YOUR_SEARCH_ENGINE_ID"
-    client = GoogleClient(api_key, search_engine_id)
-    query = "Python programming"
-    links = client.search(query)
-
-    # Print the links
-    for i in range(len(links)):
-        print(f"Link {i + 1}: {links[i]}")
-"""
+        from explore.src.main import request_mlxai
+        response = request_mlxai("gpt-4o-mini", result)
+        return response
