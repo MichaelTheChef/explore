@@ -63,8 +63,10 @@ class Search:
         for text in to_review:
             result += f"'{text[:3000]}...', "
         result += "]"
-        print(result)
 
         from explore.src.main import request_mlxai
         response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
         return response
+
+s = Search(query="top news", additional_prompt="What are the top news articles today?")
+print(s.review())
