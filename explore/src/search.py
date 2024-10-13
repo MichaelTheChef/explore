@@ -14,7 +14,6 @@ class Search:
         self.search_engine_id = search_engine_id
         self.endpoint = "https://www.googleapis.com/customsearch/v1"
 
-        self.action = kwargs.get("action")
         self.additional_prompt = kwargs.get("additional_prompt")
         self.query = kwargs.get("query")
 
@@ -64,7 +63,8 @@ class Search:
         for text in to_review:
             result += f"'{text[:3000]}...', "
         result += "]"
+        print(result)
 
         from explore.src.main import request_mlxai
-        response = request_mlxai("gpt-4o-mini", result)
+        response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
         return response
