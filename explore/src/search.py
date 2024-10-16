@@ -1,4 +1,5 @@
 import os
+import time
 
 import httpx
 import requests
@@ -14,7 +15,7 @@ class Search:
         self.search_engine_id = search_engine_id
         self.endpoint = "https://www.googleapis.com/customsearch/v1"
 
-        self.additional_prompt = kwargs.get("additional_prompt")
+        self.additional_prompt = kwargs.get("additional_prompt") or "None"
         self.query = kwargs.get("query")
 
     def search(self, query: str):
@@ -65,5 +66,5 @@ class Search:
         result += "]"
 
         from explore.src.main import request_mlxai
-        response = request_mlxai("gpt-4o", f"Additional Prompt: {self.additional_prompt}, " + result)
+        response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
         return response
