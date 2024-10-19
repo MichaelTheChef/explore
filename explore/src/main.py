@@ -4,11 +4,8 @@ import shutil
 import subprocess
 import sys
 import time
-
 import requests
 from dotenv import load_dotenv
-
-# If response from the AI is "expected str, bytes or os.PathLike object, not NoneType", make sure to fix dotenv path
 
 load_dotenv("../../.env")
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,7 +22,7 @@ def download_mlxai():
             with open(local_path, 'wb') as out_file:
                 shutil.copyfileobj(response.raw, out_file)
         else:
-            print(f"Failed to download explore.exe: {response.status_code}")
+            logging.error(f"Failed to download explore.exe: {response.status_code}")
 
 def request_mlxai(model, request):
     """
@@ -50,6 +47,7 @@ def request_mlxai(model, request):
 
         if error_output:
             logging.error(f"Error Output: {error_output.decode().strip()}")
+            return None
 
         response = output.decode().strip()
         end_time = time.time()

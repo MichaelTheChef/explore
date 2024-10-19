@@ -1,6 +1,5 @@
 import os
 import uuid
-
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import (
     SystemMessage,
@@ -14,10 +13,8 @@ from azure.core.credentials import AzureKeyCredential
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager  # To download ChromeDriver automatically
-
+from webdriver_manager.chrome import ChromeDriverManager
 from explore.src.main import logging
-
 
 def describe_image(query, image_file: str, image_format: str):
     """
@@ -63,7 +60,6 @@ def describe_image(query, image_file: str, image_format: str):
 
     return response.choices[0].message.content
 
-
 def take_ss(url, save_path):
     """
     Take a screenshot of a webpage and save it to the specified path.
@@ -76,7 +72,6 @@ def take_ss(url, save_path):
     screenshot_taker.take_screenshot(url, save_path)
     screenshot_taker.close()
 
-
 def handle_screenshot_and_request(link, query):
     """
     Handle taking a screenshot of a webpage and sending it to the ML model for processing.
@@ -87,7 +82,7 @@ def handle_screenshot_and_request(link, query):
     """
     uid = uuid.uuid4()
     screenshot_dir = os.path.abspath("screenshots")
-    os.makedirs(screenshot_dir, exist_ok=True)  # Create directory if it doesn't exist
+    os.makedirs(screenshot_dir, exist_ok=True)
     screenshot_path = os.path.join(screenshot_dir, f"screenshot-{uid}.png")
 
     take_ss(link, screenshot_path)
@@ -95,7 +90,6 @@ def handle_screenshot_and_request(link, query):
     os.remove(screenshot_path)
 
     return response
-
 
 class Screenshot:
     def __init__(self, headless: bool = True):
@@ -107,12 +101,10 @@ class Screenshot:
         """
         self.headless = headless
         self.driver = None
-
-        chrome_options = Options()
+        self.chrome_options = Options()
         if self.headless:
-            chrome_options.add_argument("--headless")
-
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+            self.chrome_options.add_argument("--headless")
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.chrome_options)
 
     def take_screenshot(self, url: str, save_path: str):
         """
@@ -124,10 +116,8 @@ class Screenshot:
         """
         try:
             self.driver.get(url)
-
             self.driver.save_screenshot(save_path)
             logging.info(f"Screenshot saved to {save_path}")
-
         except Exception as e:
             logging.error(f"Error taking screenshot: {e}")
 
