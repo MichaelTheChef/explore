@@ -1,5 +1,4 @@
 import os
-import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -8,8 +7,8 @@ from dotenv import load_dotenv
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from explore.src.screenshot import handle_screenshot_and_request
 from explore.src.main import logging
+from explore.src.screenshot import handle_screenshot_and_request
 
 load_dotenv("../../.env")
 
@@ -27,12 +26,12 @@ class Search:
         self.api_key = api_key
         self.search_engine_id = search_engine_id
         self.endpoint = "https://www.googleapis.com/customsearch/v1"
-        self.cache = TTLCache(maxsize=100, ttl=300)  # Cache with max size 100 and TTL 300 seconds
+        self.cache = TTLCache(maxsize=100, ttl=300)
 
         self.additional_prompt = kwargs.get("additional_prompt") or "None"
         self.query = kwargs["query"]
 
-    @cached(cache=TTLCache(maxsize=100, ttl=300))  # Use cache object directly here
+    @cached(cache=TTLCache(maxsize=100, ttl=300))
     def search(self, query: str):
         """
         Search for query using Google Custom Search API
@@ -50,7 +49,7 @@ class Search:
             response = requests.get(self.endpoint, params=params)
             response.raise_for_status()
             data = response.json()
-            links = [item.get("link") for item in data.get("items", [])]
+            links = [item.get("link") for item in data.get("items", [])][:5]
             logging.info(f"Search results for {query}: {links}")
             return links
         except requests.exceptions.HTTPError as e:
@@ -99,7 +98,6 @@ class Search:
 
                 texts.append(f"Error fetching {link}: HTTP error {response.status_code}")
 
-        logging.info(f"Retrieved texts: {texts}")
         return texts
 
     def review(self):
@@ -119,6 +117,3 @@ class Search:
         from explore.src.main import request_mlxai
         response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
         return response
-
-s = Search(query="Top jobs")
-print(s.review())

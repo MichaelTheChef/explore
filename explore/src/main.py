@@ -42,6 +42,7 @@ def request_mlxai(model, request):
         download_mlxai()
 
     try:
+        start_time = time.time()
         command = [mlxai_path, model, os.getenv("GITHUB_TOKEN"), request]
 
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -50,7 +51,6 @@ def request_mlxai(model, request):
         if error_output:
             logging.error(f"Error Output: {error_output.decode().strip()}")
 
-        start_time = time.time()
         response = output.decode().strip()
         end_time = time.time()
 

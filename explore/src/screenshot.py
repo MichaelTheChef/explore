@@ -20,6 +20,17 @@ from explore.src.main import logging
 
 
 def describe_image(query, image_file: str, image_format: str):
+    """
+    Describe an image using the ML model.
+
+    Args:
+        query (str): The query to send to the ML model.
+        image_file (str): The path to the image file.
+        image_format (str): The format of the image file.
+
+    Returns:
+        str: The description of the image.
+    """
     token = os.getenv("GITHUB_TOKEN")
     endpoint = "https://models.inference.ai.azure.com"
     model_name = "gpt-4o-mini"
@@ -81,6 +92,7 @@ def handle_screenshot_and_request(link, query):
 
     take_ss(link, screenshot_path)
     response = describe_image(query, screenshot_path, "png")
+    os.remove(screenshot_path)
 
     return response
 
@@ -125,5 +137,3 @@ class Screenshot:
         """
         if self.driver:
             self.driver.quit()
-
-print(handle_screenshot_and_request("https://www.google.com", "what is google?"))
