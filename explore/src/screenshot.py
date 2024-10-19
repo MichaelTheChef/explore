@@ -1,12 +1,56 @@
 import os
 import uuid
 
+from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.models import (
+    SystemMessage,
+    UserMessage,
+    TextContentItem,
+    ImageContentItem,
+    ImageUrl,
+    ImageDetailLevel,
+)
+from azure.core.credentials import AzureKeyCredential
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager  # To download ChromeDriver automatically
 
-from explore.src.main import request_mlxai, logging
+from explore.src.main import logging
+
+
+def describe_image(query, image_file: str, image_format: str):
+    token = os.getenv("GITHUB_TOKEN")
+    endpoint = "https://models.inference.ai.azure.com"
+    model_name = "gpt-4o-mini"
+
+    client = ChatCompletionsClient(
+        endpoint=endpoint,
+        credential=AzureKeyCredential(token),
+    )
+
+    response = client.complete(
+        messages=[
+            SystemMessage(
+                content="QUERY_OF_IMAGE: '<the query related to the image>' Extract the necessary text from the image that helps answer the QUERY_OF_IMAGE and return it separately as well-structured, readable text."
+            ),
+            UserMessage(
+                content=[
+                    TextContentItem(text=f"QUERY_OF_IMAGE: {query}"),
+                    ImageContentItem(
+                        image_url=ImageUrl.load(
+                            image_file=image_file,
+                            image_format=image_format,
+                            detail=ImageDetailLevel.LOW,
+                        ),
+                    ),
+                ],
+            ),
+        ],
+        model=model_name,
+    )
+
+    return response.choices[0].message.content
 
 
 def take_ss(url, save_path):
@@ -36,7 +80,7 @@ def handle_screenshot_and_request(link, query):
     screenshot_path = os.path.join(screenshot_dir, f"screenshot-{uid}.png")
 
     take_ss(link, screenshot_path)
-    response = request_mlxai("gpt-4o-mini", f"QUERY_OF_IMAGE: {query}", screenshot_path)
+    response = describe_image(query, screenshot_path, "png")
 
     return response
 
@@ -82,4 +126,4 @@ class Screenshot:
         if self.driver:
             self.driver.quit()
 
-handle_screenshot_and_request("https://www.google.com", "what is google?")
+print(handle_screenshot_and_request("https://www.google.com", "what is google?"))
