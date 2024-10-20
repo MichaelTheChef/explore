@@ -36,50 +36,36 @@ class Search:
         Args:
             query (str): Search query
             max_results (int): Maximum number of results to fetch (default: 1000)
+            start (int): Start index for search (default: None)
         """
         links = []
 
-        if start is None:
-            for start in range(1, max_results, 10):
-                params = {
-                    "key": self.api_key,
-                    "cx": self.search_engine_id,
-                    "q": query,
-                    "start": start
-                }
-
-                try:
-                    response = requests.get(self.endpoint, params=params)
-                    response.raise_for_status()
-                    data = response.json()
-                    links.extend([item.get("link") for item in data.get("items", [])])
-                    logging.info(f"Fetched {len(data.get('items', []))} results starting from {start}")
-                    if len(data.get("items", [])) < 10:
-                        break
-                except requests.exceptions.HTTPError as e:
-                    logging.error(f"HTTP error occurred during search: {e}")
-                    break
-                except requests.exceptions.RequestException as e:
-                    logging.error(f"Request error occurred during search: {e}")
-                    break
-        else:
+        def fetch_links(start):
             params = {
                 "key": self.api_key,
                 "cx": self.search_engine_id,
                 "q": query,
                 "start": start
             }
-
             try:
                 response = requests.get(self.endpoint, params=params)
                 response.raise_for_status()
                 data = response.json()
                 links.extend([item.get("link") for item in data.get("items", [])])
                 logging.info(f"Fetched {len(data.get('items', []))} results starting from {start}")
+                return len(data.get("items", []))
             except requests.exceptions.HTTPError as e:
                 logging.error(f"HTTP error occurred during search: {e}")
             except requests.exceptions.RequestException as e:
                 logging.error(f"Request error occurred during search: {e}")
+            return 0
+
+        if start is None:
+            for start in range(1, max_results, 10):
+                if fetch_links(start) < 10:
+                    break
+        else:
+            fetch_links(start)
 
         return links[:max_results]
 
