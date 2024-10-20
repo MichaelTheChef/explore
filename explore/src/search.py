@@ -120,4 +120,4 @@ class Search:
         result += "]"
         from explore.src.main import request_mlxai
         response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
-        return response
+        return response.replace("#", "")
