@@ -30,7 +30,7 @@ def describe_image(query, image_file: str, image_format: str):
     """
     token = os.getenv("GITHUB_TOKEN")
     endpoint = "https://models.inference.ai.azure.com"
-    model_name = "gpt-4o-mini"
+    model_name = "gpt-4o"
 
     client = ChatCompletionsClient(
         endpoint=endpoint,
