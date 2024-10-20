@@ -8,8 +8,6 @@ from urllib3.util.retry import Retry
 from explore.src.main import logging
 from explore.src.screenshot import handle_screenshot_and_request
 
-load_dotenv("../../.env")
-
 class Search:
     def __init__(self, api_key: str = os.getenv("SEARCH_TOKEN"),
                  search_engine_id: str = os.getenv("SEARCH_ID"), **kwargs):
@@ -27,6 +25,7 @@ class Search:
         self.cache = TTLCache(maxsize=100, ttl=300)
         self.additional_prompt = kwargs.get("additional_prompt") or "None"
         self.query = kwargs["query"]
+        self.env_path = kwargs.get("env_path") or "../../.env"
 
     @cached(cache=TTLCache(maxsize=100, ttl=300))
     def search(self, query: str, max_results: int = 100, start: int = None):
@@ -118,6 +117,9 @@ class Search:
         for text in to_review:
             result += f"'{text[:3000]}...', "
         result += "]"
+
+        load_dotenv(self.env_path)
+
         from explore.src.main import request_mlxai
         response = request_mlxai("gpt-4o-mini", f"Additional Prompt: {self.additional_prompt}, " + result)
-        return response.replace("#", "")
+        return response.replace("#", "").strip()
